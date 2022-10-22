@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App;
 
-class viewpor
+class View
 {
     public function render(?string $page): void
     {
