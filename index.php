@@ -24,4 +24,4 @@ if ($action === 'create') {
 }
 
 $view = new View();
-$view->render($action, $viewParams);
+$view->render($page, $viewParams);
