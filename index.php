@@ -8,6 +8,9 @@ namespace App;
 
 require_once('./src/controller.php');
 include_once('./src/utils/debug.php');
+require_once('./config/config.php');
+
+Controller::initConfiguration($configuration);
 
 
 $controller = new Controller($_GET, $_POST);
