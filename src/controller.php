@@ -11,15 +11,15 @@ require_once('./src/database.php');
 class Controller
 {
     const DEFAULT_ACTION = 'list';
-    private array $getData;
-    private array $postData;
     private static array $configuration = [];
     private Database $database;
+    private View $view;
+    private array $request;
 
-    public function __construct(array $getData, array $postData)
+    public function __construct(array $request)
     {
-        $this->getData = $getData;
-        $this->postData = $postData;
+        $this->request = $request;
+        $this->view = new View();
         $this->database = new Database(self::$configuration);
     }
 
@@ -35,18 +35,19 @@ class Controller
 
         $viewParams = [];
 
-        switch ($action) {
+        switch ($this->action()) {
             case 'create':
                 $page = 'create';
                 $created = false;
-                if (!empty($this->postData)) {
+                $data = $this->getRequestPost();
+                if (!empty($data)) {
                     $viewParams = [
-                        'title' => $this->postData['title'],
-                        'description' => $this->postData['description'],
+                        'title' => $data['title'],
+                        'description' => $data['description'],
                     ];
-                    header('Location: /');
-                    $created = true;
+
                     $this->database->createNote($viewParams);
+                    header('Location: /');
                 }
                 $viewParams['created'] = $created;
                 break;
@@ -56,5 +57,21 @@ class Controller
                 break;
         }
         $view->render($page, $viewParams);
+    }
+
+    private function action(): string
+    {
+        $data = $this->getRequestGet();
+        return $data['action'] ?? self::DEFAULT_ACTION;
+    }
+
+    private function getRequestPost(): array
+    {
+        return $this->request['post'] ?? [];
+    }
+
+    private function getRequestGet(): array
+    {
+        return $this->request['get'] ?? [];
     }
 }
