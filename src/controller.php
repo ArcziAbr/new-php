@@ -30,33 +30,33 @@ class Controller
 
     public function run(): void
     {
-        $action = $this->getData['action'] ?? self::DEFAULT_ACTION;
-        $view = new View();
-
-        $viewParams = [];
 
         switch ($this->action()) {
             case 'create':
                 $page = 'create';
-                $created = false;
+
                 $data = $this->getRequestPost();
                 if (!empty($data)) {
-                    $viewParams = [
+                    $noteData = [
                         'title' => $data['title'],
                         'description' => $data['description'],
                     ];
 
-                    $this->database->createNote($viewParams);
-                    header('Location: /');
+                    $this->database->createNote($noteData);
+                    header('Location: /?before=created');
                 }
-                $viewParams['created'] = $created;
+
                 break;
             default:
                 $page = 'list';
-                $viewParams['resultList'] = 'Wyświetlamy listę notatek';
+                $data = $this->getRequestGet();
+                $viewParams = [
+                    'notes' => $this->database->getNotes(),
+                    'before' => $data['before'] ?? null,
+                ];
                 break;
         }
-        $view->render($page, $viewParams);
+        $this->view->render($page, $viewParams ?? []);
     }
 
     private function action(): string
